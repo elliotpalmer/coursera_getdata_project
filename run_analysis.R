@@ -26,21 +26,28 @@
 # 5: From the data set in step 4, creates a second, independent tidy data set with the average of each variable for each activity and each subject.
 
 #------------------------#
-  COMBINE DATA
+#  COMBINE DATA
 #------------------------#
   
-  testdir <- "./test"
+  testdir  <- "./test"
   traindir <- "./train"
+  
+  features <- read.delim("features.txt", sep = "", header = FALSE)
   
   setwd(traindir)
   
   train.x <- read.delim("X_train.txt", sep = "", header = FALSE)
   train.y <- read.delim("Y_train.txt", sep = "", header = FALSE)
-
+    
   setwd("../")
   setwd(testdir)
   
   test.x <- read.delim("X_test.txt", sep = "", header = FALSE)
   test.y <- read.delim("y_test.txt", sep = "", header = FALSE)
+  
+  mean_f <- grep(c("mean"),features$V2)
+  std_f <- grep(c("std"),features$V2)
+  
+  incl_feat <- sort(append(mean_f,std_f))
   
   
