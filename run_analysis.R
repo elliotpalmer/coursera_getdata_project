@@ -1,4 +1,4 @@
-# Coursera Data Science Specialization
+# Coursera: Data Science Specialization
 # Getting and Cleaning Data
 # Course Project
 # Due Sunday Mar 22, 2015
@@ -6,6 +6,9 @@
 
 # Data URL:
 # https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip
+
+# Data Description:
+# http://archive.ics.uci.edu/ml/datasets/Human+Activity+Recognition+Using+Smartphones
 
 # Deliverables:
 # 1: a tidy data set as described below
@@ -22,3 +25,22 @@
 # 4: Appropriately labels the data set with descriptive variable names. 
 # 5: From the data set in step 4, creates a second, independent tidy data set with the average of each variable for each activity and each subject.
 
+#------------------------#
+  COMBINE DATA
+#------------------------#
+  
+  testdir <- "./test"
+  traindir <- "./train"
+  
+  setwd(traindir)
+  
+  train.x <- read.delim("X_train.txt", sep = "", header = FALSE)
+  train.y <- read.delim("Y_train.txt", sep = "", header = FALSE)
+
+  setwd("../")
+  setwd(testdir)
+  
+  test.x <- read.delim("X_test.txt", sep = "", header = FALSE)
+  test.y <- read.delim("y_test.txt", sep = "", header = FALSE)
+  
+  
