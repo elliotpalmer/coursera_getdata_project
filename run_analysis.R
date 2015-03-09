@@ -29,25 +29,74 @@
 #  COMBINE DATA
 #------------------------#
   
+  setwd("~/Coursera/Getting and Cleaning Data/Project/getdata-projectfiles-UCI HAR Dataset/UCI HAR Dataset")
+
   testdir  <- "./test"
   traindir <- "./train"
   
+  ## LOAD DATA ##
+  
   features <- read.delim("features.txt", sep = "", header = FALSE)
+  
+  act_lbl <- read.delim("activity_labels.txt",sep = "", header = FALSE)
+  colnames(act_lbl) <- c("ACTIVITY", "ACTIVITY_DESC")
   
   setwd(traindir)
   
   train.x <- read.delim("X_train.txt", sep = "", header = FALSE)
   train.y <- read.delim("Y_train.txt", sep = "", header = FALSE)
-    
+  train.s <- read.delim("subject_train.txt", sep = "", header = FALSE)
+  
   setwd("../")
   setwd(testdir)
   
   test.x <- read.delim("X_test.txt", sep = "", header = FALSE)
   test.y <- read.delim("y_test.txt", sep = "", header = FALSE)
+  test.s <- read.delim("subject_test.txt", sep = "", header = FALSE)
+  
+  ## Get Feature Columns ##
   
   mean_f <- grep(c("mean"),features$V2)
   std_f <- grep(c("std"),features$V2)
   
   incl_feat <- sort(append(mean_f,std_f))
+  
+  feature_names <- as.character(features$V2[incl_feat])
+  
+  ## Restrict Data to Mean / Std Columns ##
+  
+    test.x.r  <- test.x[,incl_feat]
+    train.x.r <- train.x[,incl_feat]
+  
+  ## Combine Data ##
+  
+    ## ADD COLUMN TO DENOTE TEST / TRAIN DATA #
+  
+    test.x.r$TEST_TRAIN  <- "TEST"
+    train.x.r$TEST_TRAIN <- "TRAIN"
+    
+    ## ADD Y values to data
+    
+    test.all <- cbind(test.x.r, test.s, test.y)
+    train.all <- cbind(train.x.r, train.s,  train.y)
+    
+    ## COMBINE TEST AND TRAIN DATA ##
+  
+    data.all <- rbind(test.all, train.all)
+    
+    ## ADD FEATURE NAMES ##
+  
+    colnames(data.all) <- append(feature_names, c("TEST_TRAIN","SUBJECT", "ACTIVITY"))
+    
+    ## ADD ACTIVITY DESCRIPTIONS ##
+  
+    data.all <- merge(data.all,act_lbl)
+    
+    ## CREATE 2ND DATA SET ##
+  
+    # NEED TO AVERAGE ALL OF THE COLUMNS AND GROUP BY SUBJECT AND ACTIVITY #
+  
+    
+    
   
   
