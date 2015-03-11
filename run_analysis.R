@@ -29,7 +29,13 @@
 #  COMBINE DATA
 #------------------------#
   
-  setwd("~/Coursera/Getting and Cleaning Data/Project/getdata-projectfiles-UCI HAR Dataset/UCI HAR Dataset")
+  zipName = "activityData.zip"
+  
+  fileCon <- download.file("https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip",zipName)
+  
+  unzip(zipName)
+  
+  setwd("./UCI HAR Dataset")
 
   testdir  <- "./test"
   traindir <- "./train"
