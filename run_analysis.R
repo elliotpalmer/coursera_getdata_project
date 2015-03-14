@@ -24,23 +24,25 @@
 # 3: Uses descriptive activity names to name the activities in the data set
 # 4: Appropriately labels the data set with descriptive variable names. 
 # 5: From the data set in step 4, creates a second, independent tidy data set with the average of each variable for each activity and each subject.
-
-#------------------------#
-#  COMBINE DATA
-#------------------------#
   
+#1. Download Data
+
+  wd <- getwd()
+
   zipName = "activityData.zip"
   
   fileCon <- download.file("https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip",zipName)
   
+#2. Unzip file  
+
   unzip(zipName)
+
+#3. Load each of the individual text files in to R
   
   setwd("./UCI HAR Dataset")
 
   testdir  <- "./test"
   traindir <- "./train"
-  
-  ## LOAD DATA ##
   
   features <- read.delim("features.txt", sep = "", header = FALSE)
   
@@ -60,49 +62,59 @@
   test.y <- read.delim("y_test.txt", sep = "", header = FALSE)
   test.s <- read.delim("subject_test.txt", sep = "", header = FALSE)
   
-  ## Get Feature Columns ##
+#4. Determine which variables are mean and std variables
   
-  mean_f <- grep(c("mean"),features$V2)
-  std_f <- grep(c("std"),features$V2)
+  mean_f <- grep(c("mean()"),features$V2,fixed = T)
+  std_f <- grep(c("std()"),features$V2,fixed = T)
+
+#5. Create vector to select mean and std variables
   
   incl_feat <- sort(append(mean_f,std_f))
   
   feature_names <- as.character(features$V2[incl_feat])
   
-  ## Restrict Data to Mean / Std Columns ##
+#6. Subset the Test and Train data to only include mean and std variables
   
     test.x.r  <- test.x[,incl_feat]
     train.x.r <- train.x[,incl_feat]
   
-  ## Combine Data ##
-  
-    ## ADD COLUMN TO DENOTE TEST / TRAIN DATA #
+#7. Add test and train lables to each observation
   
     test.x.r$TEST_TRAIN  <- "TEST"
     train.x.r$TEST_TRAIN <- "TRAIN"
     
-    ## ADD Y values to data
+#8. Combine X, Y, Subject Variables for both test and train data sets
     
     test.all <- cbind(test.x.r, test.s, test.y)
     train.all <- cbind(train.x.r, train.s,  train.y)
     
-    ## COMBINE TEST AND TRAIN DATA ##
+#9. Combine Test and Train Data Sets
   
     data.all <- rbind(test.all, train.all)
     
-    ## ADD FEATURE NAMES ##
+#10. Add the variable names to the data set
   
     colnames(data.all) <- append(feature_names, c("TEST_TRAIN","SUBJECT", "ACTIVITY"))
     
-    ## ADD ACTIVITY DESCRIPTIONS ##
+#11. Add activity descriptions
   
     data.all <- merge(data.all,act_lbl)
-    
-    ## CREATE 2ND DATA SET ##
+    data.all2 <- data.all[,c("SUBJECT","ACTIVITY","ACTIVITY_DESC","TEST_TRAIN",names(data.all[,2:67]))]
+      
   
-    # NEED TO AVERAGE ALL OF THE COLUMNS AND GROUP BY SUBJECT AND ACTIVITY #
+#12. Create second data set that averages each variable over each activity and subject
+    
+    data.agg <- aggregate(data.all[,2:67],
+                          by=list(SUBJECT = data.all$SUBJECT,
+                                  ACTIVITY = data.all$ACTIVITY,
+                                  ACTIVITY_DESC = data.all$ACTIVITY_DESC,
+                                  TEST_TRAIN = data.all$TEST_TRAIN),
+                          FUN = mean)
+    
+#13. write the data sets out to text files
   
-    
-    
+    setwd(wd)
+    write.table(data.all,"tidydata.txt",row.name = FALSE)
+    write.table(data.agg,"tidydata_agg.txt",row.name = FALSE)
   
   
